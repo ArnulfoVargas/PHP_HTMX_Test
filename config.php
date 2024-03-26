@@ -4,3 +4,4 @@
     $url = substr($urlPath, strlen($folderPath));
 
     define('URL', $url);
+    define('ROOT', __DIR__);

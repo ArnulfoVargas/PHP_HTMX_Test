@@ -1,7 +1,7 @@
 <?php 
     class baseController {
         public function index(){
-            require_once("./views/home.php");
+            require_once(ROOT."/views/baseIndex.php");
         }
 
         public function login(){

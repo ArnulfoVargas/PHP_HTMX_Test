@@ -2,6 +2,7 @@
     class Router {
         public $controller;
         public $method;
+        private $dir;
 
         public function __construct() {
           $this->matchRoute();
@@ -25,16 +26,33 @@
                     break;
             }
 
-            require_once(__DIR__ ."/controllers/".$this->controller.".php");
+            $this->dir =  __DIR__ ."/controllers/".$this->controller.".php";
+
+            if (!file_exists( $this->dir )) {
+                return;
+            }
+
+            require_once($this->dir);
         }
 
         public function run(){
-            $controller = new $this->controller();
-            $method = $this->method;
-            if (method_exists($controller, $method)) {
-                $controller->$method();
-            } else {
-                require_once("./views/404.php");
+            if (!class_exists($this->controller)) {
+                $this->ErrNotFound();
+                return;
             }
+
+            $controller = new $this->controller();
+
+            if (!method_exists($controller, $this->method)) {
+                $this->ErrNotFound();
+                return;
+            } 
+
+            $method = $this->method;
+            $controller->$method();
+       }
+
+        private function ErrNotFound(){
+            require_once(__DIR__."/views/404.php");
         }
     }
