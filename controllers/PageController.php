@@ -7,4 +7,8 @@
         public function about(){
             echo"about";
         }
+
+        public function test(){
+            include_once("./views/test.php");
+        }
     }

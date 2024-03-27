@@ -11,22 +11,30 @@
         public function matchRoute(){
             $url = explode("/", URL);
 
-            switch (count($url)) {
-                case 4:
-                    $this->controller = $url[2]."Controller";
-                    $this->method = $url[3];
-                    break;
-                case 3:
-                    $this->controller = $url[1] . "Controller";
-                    $this->method = $url[2];
-                    break;
-                case 2:
-                    $this->controller = "baseController";
-                    $this->method = empty($url[1]) ? "index" : $url[1];
-                    break;
+            foreach ($url as $path){
+                if (empty($path)){
+                    continue;
+                }
+
+                $dir = ROOT."/controllers/".$path."Controller.php";
+
+                if (empty($this->controller)){
+                    if (file_exists($dir)) {
+                        $this->controller = $path."Controller";
+                    }
+                } else {
+                    $this->method = $path;
+                }
             }
 
-            $this->dir =  __DIR__ ."/controllers/".$this->controller.".php";
+            if (empty($this->controller)){
+                $this->controller = "baseController";
+            }
+            if (empty($this->method)){
+                $this->method = "index";
+            }
+
+            $this->dir = ROOT."/controllers/".$this->controller.".php";
 
             if (!file_exists( $this->dir )) {
                 return;
@@ -43,6 +51,10 @@
 
             $controller = new $this->controller();
 
+            if (str_contains($this->method,"?")){
+                $this->method = explode("?", $this->method)[0];
+            }
+
             if (!method_exists($controller, $this->method)) {
                 $this->ErrNotFound();
                 return;
@@ -53,6 +65,6 @@
        }
 
         private function ErrNotFound(){
-            require_once(__DIR__."/views/404.php");
+            require_once(ROOT."/views/404.php");
         }
     }
